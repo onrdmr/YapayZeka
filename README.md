@@ -7,6 +7,6 @@ Watashi Nay
     python3 getDataset.py
 	
 
-[Selenium Spoofer ile Veri çekme örneği](https://www.linkedin.com/pulse/preventing-selenium-from-being-detected-soumil-shah/?trackingId=qoRGEd4DTw2paNWtfOrXfg%3D%3D](https://www.linkedin.com/pulse/preventing-selenium-from-being-detected-soumil-shah/)
+[Selenium Spoofer ile Veri çekme örneği](https://www.linkedin.com/pulse/preventing-selenium-from-being-detected-soumil-shah/)
 
 
