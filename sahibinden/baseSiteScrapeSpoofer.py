@@ -5,35 +5,20 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-# sahibinden otomasyon aracını buluyor engellemek için
-from fake_useragent import UserAgent
-# from selenium_stealth import stealth
 
-
+from spoofer import WebDriver
 
 import re
 import sys
 import time
 
 
-ua = UserAgent()
-userAgent = ua.random
-
-
-chrome_options = Options()
-
-chrome_options.add_argument(f'user-agent={userAgent}')
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-chrome_options.add_experimental_option('useAutomationExtension', False)
-
-
 
 driver_path = "/mnt/c/Users/filiz/osuScrape/driver/chromedriver"
 
-driver = webdriver.Chrome(executable_path=driver_path, chrome_options=chrome_options)
+
+driver= WebDriver(driver_path)
+driverinstance = driver.driver_instance
 
 # stealth(driver,
 #       languages=["en-US", "en"],
@@ -45,7 +30,7 @@ driver = webdriver.Chrome(executable_path=driver_path, chrome_options=chrome_opt
 #   )
 
 # sys.argv[1]
-sites_list = open("sites.txt").readlines()
+sites_list = open(sys.argv[1]).readlines()
 
 # tüm verisetin olacağı sözlük 
 # her bir meta veri için liste olacak ve bu listeyi sonrakindekiler işeretlenerek yazılacak.
@@ -76,15 +61,14 @@ while idx < len(sites_list):
     print("INFO : Scraping ", site)
     try :
         time.sleep(0.05)
-        driver.get(site.strip())
-        driver.maximize_window()
+        driverinstance.get(site.strip())
 
 
-        ad_detail = driver.find_element_by_xpath('//*[@id="classifiedDescription"]')
+        ad_detail = driverinstance.find_element_by_xpath('//*[@id="classifiedDescription"]')
         ad_detail_text = ad_detail.text
 
         # ilan no , ilan tarihi, marka, seri, model, yıl, Yakıt, vites, km, kasa tipi, motor gücvü, motor hacmi, Çekiş, renk, Garanti, Plaka, Kimden, takas, durumu
-        base_list = driver.find_element_by_xpath('//*[@id="classifiedDetail"]/div/div[2]/div[2]/ul')
+        base_list = driverinstance.find_element_by_xpath('//*[@id="classifiedDetail"]/div/div[2]/div[2]/ul')
         base_list_text = base_list.text
         base=base_list_text.split("\n")
         adv_no = base[1].strip()
@@ -107,24 +91,24 @@ while idx < len(sites_list):
         adv_state = base[39].strip()
 
         # car price
-        car_price = driver.find_element_by_xpath('//*[@id="classifiedDetail"]/div/div[2]/div[2]/h3')
+        car_price = driverinstance.find_element_by_xpath('//*[@id="classifiedDetail"]/div/div[2]/div[2]/h3')
         car_price = car_price.text.split('\n')[0].strip()
 
         try :
-            technical_details_style_button = driver.find_element_by_xpath('//*[@id="teknik-detaylar"]')
+            technical_details_style_button = driverinstance.find_element_by_xpath('//*[@id="teknik-detaylar"]')
         except: 
             print("INFO :bu site teknik özellik içermemektedir.", site)
             idx+=1
             continue
-        technical_details_hardware_button = driver.find_element_by_xpath('//*[@id="technical-details"]/div/div[4]/ul/li[1]')
+        technical_details_hardware_button = driverinstance.find_element_by_xpath('//*[@id="technical-details"]/div/div[4]/ul/li[1]')
 
 
         # technical section is opened now we can read its content
         technical_details_style_button.send_keys(Keys.RETURN)
         # and the click hardware
-        driver.execute_script("arguments[0].click();",technical_details_hardware_button)
+        driverinstance.execute_script("arguments[0].click();",technical_details_hardware_button)
 
-        technical_details_web_element = driver.find_element_by_xpath('//*[@id="technical-details"]')
+        technical_details_web_element = driverinstance.find_element_by_xpath('//*[@id="technical-details"]')
         time.sleep(0.01)
         technical_details_list = technical_details_web_element.find_elements_by_xpath('.//tr')
         
@@ -178,7 +162,7 @@ while idx < len(sites_list):
                 print("WARNING : Misunderstading Error occured.")
                 break
 
-        technical_details_hardware_table = driver.find_element_by_xpath('//*[@id="technical-details"]/div/div[4]/ul/li[2]')
+        technical_details_hardware_table = driverinstance.find_element_by_xpath('//*[@id="technical-details"]/div/div[4]/ul/li[2]')
         technical_details_hardware_list = technical_details_hardware_table.find_elements_by_xpath('.//tr')
 
         for web_element in technical_details_hardware_list:
@@ -238,13 +222,13 @@ while idx < len(sites_list):
         #     if len(dataset_dict[key]) == len(dataset_dict['Ilan No']):
         #         dataset_dict[key].pop()
         try : 
-            driver.close()
-            driver.quit() # for removal seesion id
+            driverinstance.close()
+            driverinstance.quit() # for removal seesion id
             # time.sleep(300)
             print("INFO : Bekleme süresi bitti. Driver Yeniden Başlatılıyor")
-            driver_path = "/mnt/c/Users/filiz/osuScrape/driver/chromedriver"
-
-            driver = webdriver.Chrome(executable_path=driver_path, chrome_options=chrome_options)
+            
+            driver= WebDriver(driver_path)
+            driverinstance = driver.driver_instance
 
             # stealth(driver,
             #     languages=["en-US", "en"],
@@ -277,8 +261,8 @@ with open('volvoDataset2.csv', 'a') as csv_file:
             row_list.append(list(dataset_dict[key])[i])
         writer.writerow(row_list)
 
-driver.close()
-driver.quit()
+driverinstance.close()
+driverinstance.quit()
 # import csv
 # lock = open("lock","r+")
 
