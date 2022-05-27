@@ -1,0 +1,3 @@
+veri setinin ham hali volvoDataset2.csv dosyasında,
+veri setinin işlenmiş hali volvo_cleaned dosyasında,
+makine öğrenmesi kodları model.ipynb ve model.py dosyalarındadır.
